@@ -1,0 +1,75 @@
+version: "3.8"
+services:
+  vault-server:
+    image: hashicorp/vault:latest
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_ADDR: "http://0.0.0.0:8200"
+      VAULT_DEV_ROOT_TOKEN_ID: "vault-plaintext-root-token"
+    cap_add:
+      - IPC_LOCK
+    networks:
+      concourse-network:
+        ipv4_address: 172.21.0.10
+        aliases:
+          - vault-server
+
+  vault-client:
+    build: .
+    environment:
+      VAULT_ADDR: "http://vault-server:8200"
+    networks:
+      concourse-network:
+        ipv4_address: 172.21.0.20
+        aliases:
+          - vault-client
+
+  concourse-db:
+    image: postgres
+    environment:
+      POSTGRES_DB: concourse
+      POSTGRES_PASSWORD: concourse_pass
+      POSTGRES_USER: concourse_user
+      PGDATA: /database
+    networks:
+      concourse-network:
+        ipv4_address: 172.21.0.30
+        aliases:
+          - concourse-db
+
+  concourse:
+    image: rdclda/concourse:7.5.0
+    command: quickstart
+    privileged: true
+    depends_on: [concourse-db]
+    ports: ["8080:8080"]
+    environment:
+      CONCOURSE_POSTGRES_HOST: concourse-db
+      CONCOURSE_POSTGRES_USER: concourse_user
+      CONCOURSE_POSTGRES_PASSWORD: concourse_pass
+      CONCOURSE_POSTGRES_DATABASE: concourse
+      CONCOURSE_EXTERNAL_URL: http://localhost:8080
+      CONCOURSE_ADD_LOCAL_USER: test:test
+      CONCOURSE_MAIN_TEAM_LOCAL_USER: test
+      CONCOURSE_WORKER_BAGGAGECLAIM_DRIVER: overlay
+      CONCOURSE_CLIENT_SECRET: Y29uY291cnNlLXdlYgo=
+      CONCOURSE_TSA_CLIENT_SECRET: Y29uY291cnNlLXdvcmtlcgo=
+      CONCOURSE_X_FRAME_OPTIONS: allow
+      CONCOURSE_CONTENT_SECURITY_POLICY: "*"
+      CONCOURSE_CLUSTER_NAME: arm64
+      CONCOURSE_WORKER_CONTAINERD_DNS_SERVER: "8.8.8.8"
+      CONCOURSE_WORKER_RUNTIME: "containerd"
+      CONCOURSE_VAULT_URL: http://vault-server:8200
+      CONCOURSE_VAULT_CLIENT_TOKEN: "vault-plaintext-root-token"
+    networks:
+      concourse-network:
+        ipv4_address: 172.21.0.40
+        aliases:
+          - concourse
+
+networks:
+  concourse-network:
+    ipam:
+      config:
+        - subnet: 172.21.0.0/24

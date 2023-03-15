@@ -1,0 +1,25 @@
+resources:
+- name: examples
+  type: git
+  source:
+    uri: https://github.com/jvidalg/concourse-examples.git
+    branch: master
+    private_key: ((github_private_key))
+
+jobs:
+- name: build-on-master-push
+  plan:
+  - get: examples
+    trigger: true
+  - task: build-task
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: {repository: busybox}
+      run:
+        path: sh
+        args:
+        - -exc
+        - |
+          echo "Building on specific branch..."

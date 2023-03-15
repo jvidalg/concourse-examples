@@ -1,0 +1,42 @@
+resource_types:
+- name: pull-request
+  type: registry-image
+  source:
+    repository: teliaoss/github-pr-resource
+
+resources:
+- name: pr
+  type: pull-request
+  check_every: 1m
+  source:
+    repository: jvidalg/concourse-examples
+    access_token: ((github_access_token))
+
+jobs:
+- name: pr-build
+  plan:
+  - get: pr
+    version: every
+    trigger: true
+  - put: pr
+    params:
+      path: pr
+      status: pending
+  - task: build-task
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: {repository: busybox}
+      inputs:
+      - name: pr
+      run:
+        path: sh
+        args:
+        - -exc
+        - |
+          echo "Building on pull request..."
+  - put: pr
+    params:
+      path: pr
+      status: success
