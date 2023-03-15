@@ -3,11 +3,11 @@ resources:
   type: git
   source:
     uri: https://github.com/jvidalg/concourse-examples.git
-    branch: master
+    branch: main
     private_key: ((github_private_key))
 
 jobs:
-- name: build-on-master-push
+- name: build-on-main-push
   plan:
   - get: examples
     trigger: true

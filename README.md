@@ -39,7 +39,8 @@ fly --target tutorial sync
 
 ## Pipelines
 
-### basic/hello-world
+### basic
+#### hello-world
 
 ```
 fly -t tutorial set-pipeline -p hello-world -c hello-world.yml
@@ -47,6 +48,16 @@ fly -t tutorial set-pipeline -p hello-world -c hello-world.yml
 fly -t tutorial unpause-pipeline -p hello-world
 # trigger the job and watch it run to completion
 fly -t tutorial trigger-job --job hello-world/hello-world-job --watch
+```
+
+### events
+
+#### push
+
+```
+fly -t tutorial set-pipeline -p push-main -c push.yml
+fly -t tutorial unpause-pipeline -p push-main
+fly -t tutorial trigger-job --job push-main/build-on-main-push --watch
 ```
 
 ### Events
