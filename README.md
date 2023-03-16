@@ -60,10 +60,20 @@ fly -t tutorial unpause-pipeline -p push-main
 fly -t tutorial trigger-job --job push-main/build-on-main-push --watch
 ```
 
-### Events
+#### pull-request
 
 ```
 
+```
+
+### credential manager
+
+#### vault
+
+```
+fly -t target-name login -c https://your-concourse-url
+fly -t target-name set-pipeline -p test-pipeline -c test-pipeline.yml
+fly -t target-name unpause-pipeline -p test-pipeline
 ```
 
 ## Credentials Manager
@@ -71,3 +81,5 @@ fly -t tutorial trigger-job --job push-main/build-on-main-push --watch
 ### Vault
 
 
+#### useful links and references
+  -  https://pirix-tech.medium.com/integrate-concourse-with-vault-for-credential-management-b87130c32972

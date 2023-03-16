@@ -1,0 +1,30 @@
+resources:
+- name: 5m
+  type: time
+  source:
+    interval: 5m
+
+jobs:
+- name: test-vault-credentials
+  public: true
+  plan:
+  - get: 5m
+    trigger: true
+  - task: use-credentials
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          repository: busybox
+      inputs:
+      - name: 5m
+      run:
+        path: sh
+        args:
+        - -exc
+        - |
+          echo "Username: ((vault_creds.username))"
+          echo "Password: ((vault_creds.password))"
+    params:
+      vault_creds: ((secret/concourse/test))
