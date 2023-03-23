@@ -1,0 +1,55 @@
+resource_types:
+  - name: android-sdk
+    type: docker-image
+    source:
+      repository: thyrlian/android-sdk
+
+resources:
+  - name: sunflower-repo
+    type: git
+    source:
+      uri: https://github.com/jvidalg/sunflower.git
+      branch: main
+
+jobs:
+  - name: build-apk-aab
+    plan:
+      - get: sunflower-repo
+        trigger: true
+      - task: build
+        config:
+          platform: linux
+          image_resource:
+            type: android-sdk
+            source:
+              repository: thyrlian/android-sdk
+          inputs:
+            - name: sunflower-repo
+          outputs:
+            - name: output
+          run:
+            path: sh
+            args:
+              - -exc
+              - |
+                # Set up environment variables
+                export ANDROID_SDK_ROOT=/opt/android-sdk-linux
+                export ANDROID_HOME=/opt/android-sdk-linux
+                export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
+
+                # Accept Android SDK licenses
+                yes | sdkmanager --licenses
+
+                # Go to the project directory
+                cd sunflower-repo
+
+                # Build the APK
+                ./gradlew assembleDebug
+
+                # Build the AAB
+                ./gradlew bundleDebug
+
+                # Move the APK and AAB files to the output directory
+                mkdir -p output/
+                cp app/build/outputs/apk/debug/app-debug.apk output/
+                cp app/build/outputs/bundle/debug/app-debug.aab output/

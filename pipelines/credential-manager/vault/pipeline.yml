@@ -1,14 +1,14 @@
 resources:
-- name: 5m
+- name: scheduler
   type: time
   source:
-    interval: 5m
+    interval: 2m
 
 jobs:
 - name: test-vault-credentials
   public: true
   plan:
-  - get: 5m
+  - get: scheduler
     trigger: true
   - task: use-credentials
     config:
@@ -18,7 +18,7 @@ jobs:
         source:
           repository: busybox
       inputs:
-      - name: 5m
+      - name: scheduler
       run:
         path: sh
         args:
@@ -27,4 +27,4 @@ jobs:
           echo "Username: ((vault_creds.username))"
           echo "Password: ((vault_creds.password))"
     params:
-      vault_creds: ((secret/concourse/test))
+      vault_creds: ((concourse/dev))

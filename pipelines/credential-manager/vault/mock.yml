@@ -1,0 +1,11 @@
+resources:
+- name: mock-vault
+  type: mock
+  source:
+    key1: ((dev.username))
+    key2: ((dev.password))
+
+jobs:
+- name: sample-job
+  plan:
+  - get: mock-vault

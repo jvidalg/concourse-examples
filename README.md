@@ -71,9 +71,18 @@ fly -t tutorial trigger-job --job push-main/build-on-main-push --watch
 #### vault
 
 ```
-fly -t target-name login -c https://your-concourse-url
-fly -t target-name set-pipeline -p test-pipeline -c test-pipeline.yml
-fly -t target-name unpause-pipeline -p test-pipeline
+fly -t tutorial set-pipeline -p vault-stdout -c pipeline.yml
+fly -t tutorial unpause-pipeline -p vault-stdout
+fly -t tutorial trigger-job --job vault-stdout/test-vault-credentials --watch
+```
+
+### resources
+
+#### mobile
+
+```
+fly -t <your-target> set-pipeline -p sunflower-pipeline -c sunflower-pipeline.yml
+
 ```
 
 ## Credentials Manager

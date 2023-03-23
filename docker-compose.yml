@@ -62,6 +62,9 @@ services:
       CONCOURSE_WORKER_RUNTIME: "containerd"
       CONCOURSE_VAULT_URL: http://vault-server:8200
       CONCOURSE_VAULT_CLIENT_TOKEN: "vault-plaintext-root-token"
+      #CONCOURSE_VAULT_AUTH_BACKEND: "token"
+      #CONCOURSE_VAULT_AUTH_PARAM: "token=vault-plaintext-root-token"
+      CONCOURSE_VAULT_PATH_PREFIX: "/concourse"
     networks:
       concourse-network:
         ipv4_address: 172.21.0.40
